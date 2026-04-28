@@ -1,0 +1,95 @@
+### Authentication - Login as Candidate
+POST http://localhost:8080/api/v1/auth/token
+Content-Type: application/json
+
+{
+  "username": "amara.jones@example.com",
+  "password": "password"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+
+### Get Candidate Profile
+GET http://localhost:8080/api/v1/candidates/me
+Authorization: Bearer {{auth_token}}
+
+### Update Candidate Profile
+PUT http://localhost:8080/api/v1/candidates/me/profile
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "summary": "Experienced nurse looking for locum shifts.",
+  "primaryDiscipline": "Nursing",
+  "band": "Band 5",
+  "currentLocation": "London",
+  "availabilityStatus": "AVAILABLE",
+  "availabilityNotes": "Looking for night shifts mostly."
+}
+
+### Add Availability
+POST http://localhost:8080/api/v1/candidates/me/availability
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "availableFrom": "2023-11-01",
+  "availabilityType": "AVAILABLE",
+  "notes": "Available for night shifts starting November."
+}
+
+### Get Compliance Dashboard
+GET http://localhost:8080/api/v1/candidates/me/compliance
+Authorization: Bearer {{auth_token}}
+
+### Get Placements
+GET http://localhost:8080/api/v1/candidates/me/placements
+Authorization: Bearer {{auth_token}}
+
+### Get Timesheets
+GET http://localhost:8080/api/v1/candidates/me/timesheets
+Authorization: Bearer {{auth_token}}
+
+### Authentication - Login as Admin
+POST http://localhost:8080/api/v1/auth/token
+Content-Type: application/json
+
+{
+  "username": "admin@tophat.com",
+  "password": "password"
+}
+
+> {%
+    client.global.set("admin_token", response.body.token);
+%}
+
+### Admin - List Candidates
+GET http://localhost:8080/api/v1/admin/candidates
+Authorization: Bearer {{admin_token}}
+
+### Admin - Get Candidate Details
+GET http://localhost:8080/api/v1/admin/candidates/00000000-0000-0000-0000-000000000201
+Authorization: Bearer {{admin_token}}
+
+### Admin - List Jobs
+GET http://localhost:8080/api/v1/admin/jobs
+Authorization: Bearer {{admin_token}}
+
+### Admin - Create Job
+POST http://localhost:8080/api/v1/admin/jobs
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "clientId": "00000000-0000-0000-0000-000000000301",
+  "title": "Emergency Nurse",
+  "discipline": "Nursing",
+  "band": "Band 5",
+  "employmentType": "LOCUM",
+  "description": "Urgent requirement for A&E.",
+  "payRateMin": 25.00,
+  "payRateMax": 35.00,
+  "status": "PUBLISHED"
+}

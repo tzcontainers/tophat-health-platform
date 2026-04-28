@@ -1,0 +1,10 @@
+<svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="14" fill="#0E7490"/>
+    <path d="M12 18H36V22H27V36H21V22H12V18Z" fill="white"/>
+    <path d="M22 12H26V26H22V12Z" fill="#BAE6FD"/>
+    <text x="60" y="20" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0F172A">TopHat Health
+        Care
+    </text>
+    <text x="60" y="37" font-family="Arial, sans-serif" font-size="11" fill="#475569">Healthcare staffing platform
+    </text>
+</svg>

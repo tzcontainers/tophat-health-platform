@@ -1,0 +1,29 @@
+#spring:
+#  application:
+#    name: tophat-health-backend
+#  datasource:
+#    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tophat_health}
+#    username: ${SPRING_DATASOURCE_USERNAME:tophat}
+#    password: ${SPRING_DATASOURCE_PASSWORD:tophat}
+#  jpa:
+#
+#    hibernate:
+#      show-sql: true # <--- 1. BASIC SQL LOGGING
+##      format_sql: true # <--- 2. PRETTY PRINTING (Readable format)
+##      highlight_sql: true # <--- 3. COLOR CODING (If your terminal supports it)
+#      ddl-auto: validate
+#    open-in-view: false
+#  servlet:
+#    multipart:
+#      max-file-size: 10MB
+#      max-request-size: 10MB
+#  flyway:
+#    enabled: true
+#    locations: classpath:db/migration
+#server:
+#  port: ${SERVER_PORT:8080}
+#app:
+#  storage:
+#    location: ${APP_STORAGE_LOCATION:./storage}
+#  cors:
+#    allowed-origins: http://localhost:3000,http://frontend:3000
