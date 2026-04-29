@@ -10,7 +10,7 @@ export function PaginationControls({page, totalPages, hasPrevious, hasNext, onPa
     const displayPage = totalPages === 0 ? 0 : page + 1;
 
     return (
-        <div className="row-actions" style={{justifyContent: 'space-between'}}>
+        <div className="row-actions pagination-controls">
             <button
                 className="btn secondary compact"
                 disabled={!hasPrevious}
@@ -18,7 +18,7 @@ export function PaginationControls({page, totalPages, hasPrevious, hasNext, onPa
             >
                 Previous
             </button>
-            <span className="muted" style={{fontWeight: 800}}>
+            <span className="muted">
                 Page {displayPage} of {totalPages}
             </span>
             <button

@@ -18,14 +18,14 @@ export default function ClientVacancyRequestsPage() {
             shiftPattern: form.get('shiftPattern'),
             notes: form.get('notes')
         }, 'client');
-        setMessage(`Vacancy request created with id ${result.id}`);
+        setMessage(`Role request created with id ${result.id}`);
         event.currentTarget.reset();
     }
 
     return (
         <div className="page-section stack">
             <form className="card stack" onSubmit={onSubmit}>
-                <div className="section-title"><h1 style={{margin: 0}}>Create vacancy request</h1><span
+                <div className="section-title"><h1 style={{margin: 0}}>Create role request</h1><span
                     className="badge">New request</span></div>
                 <div className="form-grid">
                     <input className="input" name="title" placeholder="Role title" required/>
@@ -34,7 +34,7 @@ export default function ClientVacancyRequestsPage() {
                     <input className="input" name="shiftPattern" placeholder="Shift pattern"/>
                 </div>
                 <textarea className="textarea" name="notes" placeholder="Context, rota notes, urgent coverage details"/>
-                <button className="btn">Submit vacancy request</button>
+                <button className="btn">Submit role request</button>
             </form>
             {message && <div className="notice">{message}</div>}
         </div>

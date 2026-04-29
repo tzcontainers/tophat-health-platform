@@ -54,7 +54,7 @@ export default function CandidateDashboardPage() {
 
     return (
         <div className="page-section stack">
-            <div className="section-title"><h1 style={{margin: 0}}>Candidate dashboard</h1><span className="badge">Live workspace</span>
+            <div className="section-title"><h1 style={{margin: 0}}>Candidate overview</h1><span className="badge">Workspace snapshot</span>
             </div>
             <div className="kpi-grid">
                 <StatCard label="Candidate" value={me.data?.candidateNumber || '…'}/>
@@ -113,7 +113,7 @@ export default function CandidateDashboardPage() {
                     </table>
                 </TableCard>
             </div>
-            <TableCard title="Matched jobs" actions={<span className="badge">{jobsPage.totalItems} matching</span>}>
+            <TableCard title="Matched roles" actions={<span className="badge">{jobsPage.totalItems} matching</span>}>
                 <div className="stack">
                     <div className="form-grid">
                         <input className="input" placeholder="Search" value={jobSearch}
@@ -157,7 +157,7 @@ export default function CandidateDashboardPage() {
                         ))}
                         {!matchedJobs.isLoading && jobsPage.items.length === 0 && (
                             <tr>
-                                <td colSpan={7} className="muted" style={{textAlign: 'center'}}>No jobs match the selected filters.</td>
+                                <td colSpan={7} className="muted" style={{textAlign: 'center'}}>No roles match the selected filters.</td>
                             </tr>
                         )}
                         </tbody>

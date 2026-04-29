@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: '/admin/users', label: 'Manage Users' },
         { href: '/admin/teams', label: 'Manage Teams' },
         { href: '/admin/candidates', label: 'Candidates' },
-        { href: '/admin/jobs', label: 'Jobs' },
+        { href: '/admin/jobs', label: 'Roles' },
         { href: '/admin/compliance', label: 'Compliance' },
         { href: '/admin/placements', label: 'Placements' },
         { href: '/admin/reports', label: 'Reports' }

@@ -46,16 +46,16 @@ export default function ClientDashboardPage() {
 
     return (
         <div className="page-section stack">
-            <div className="section-title"><h1 style={{margin: 0}}>Client dashboard</h1><span className="badge">Workforce snapshot</span>
+            <div className="section-title"><h1 style={{margin: 0}}>Client overview</h1><span className="badge">Workforce snapshot</span>
             </div>
             <div className="kpi-grid">
-                <StatCard label="Live jobs" value={jobsPage.totalItems || 0}/>
+                <StatCard label="Live roles" value={jobsPage.totalItems || 0}/>
                 <StatCard label="Placements" value={placements.data?.length || 0}/>
                 <StatCard label="Pending approvals" value={pending.data?.length || 0}
                           tone={(pending.data?.length || 0) > 0 ? 'warning' : 'success'}/>
             </div>
             <TableCard
-                title="Jobs"
+                title="Roles"
                 actions={<span className="badge">{jobsPage.totalItems} matching</span>}
             >
                 <div className="stack">
@@ -103,7 +103,7 @@ export default function ClientDashboardPage() {
                         ))}
                         {jobsPage.items.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="muted" style={{textAlign: 'center'}}>No jobs match the selected filters.</td>
+                                <td colSpan={5} className="muted" style={{textAlign: 'center'}}>No roles match the selected filters.</td>
                             </tr>
                         )}
                         </tbody>

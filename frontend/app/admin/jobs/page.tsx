@@ -52,7 +52,7 @@ export default function AdminJobsPage() {
             status: 'PUBLISHED'
         }, 'admin');
         await refetch();
-        setMessage('Job created.');
+        setMessage('Role created.');
         event.currentTarget.reset();
     }
 
@@ -64,16 +64,16 @@ export default function AdminJobsPage() {
             title: `${first.title}`
         }, 'admin');
         await refetch();
-        setMessage('First job updated.');
+        setMessage('First role updated.');
     }
 
     return (
         <div className="page-section stack">
             <form className="card stack" onSubmit={createJob}>
-                <div className="section-title"><h1 style={{margin: 0}}>Manage jobs</h1><span className="badge">{jobsPage.totalItems} roles</span>
+                <div className="section-title"><h1 style={{margin: 0}}>Manage roles</h1><span className="badge">{jobsPage.totalItems} roles</span>
                 </div>
                 <div className="form-grid">
-                    <input className="input" name="title" placeholder="Job title" required/>
+                    <input className="input" name="title" placeholder="Role title" required/>
                     <input className="input" name="discipline" placeholder="Discipline" required/>
                     <input className="input" name="band" placeholder="Band"/>
                     <input className="input" name="employmentType" placeholder="LOCUM / PERM"/>
@@ -83,14 +83,14 @@ export default function AdminJobsPage() {
                 </div>
                 <textarea className="textarea" name="description" placeholder="Role description" required/>
                 <div style={{display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
-                    <button className="btn">Create job</button>
-                    <button type="button" className="btn secondary" onClick={publishFirstDraft}>Patch first job</button>
+                    <button className="btn">Create role</button>
+                    <button type="button" className="btn secondary" onClick={publishFirstDraft}>Update first role</button>
                 </div>
             </form>
 
             <div className="card stack">
                 <div className="section-title">
-                    <h3 style={{margin: 0}}>Filter jobs</h3>
+                    <h3 style={{margin: 0}}>Filter roles</h3>
                     <span className="badge">All statuses</span>
                 </div>
                 <div className="form-grid">
@@ -142,7 +142,7 @@ export default function AdminJobsPage() {
                     </tr>)}
                     {jobsPage.items.length === 0 && (
                         <tr>
-                            <td colSpan={7} className="muted" style={{textAlign: 'center'}}>No jobs match the selected filters.</td>
+                            <td colSpan={7} className="muted" style={{textAlign: 'center'}}>No roles match the selected filters.</td>
                         </tr>
                     )}
                     </tbody>

@@ -63,7 +63,7 @@ export function Header() {
                     />
                 </Link>
                 <nav className="nav">
-                    <Link href="/jobs" className={linkClass('/jobs')}>Jobs</Link>
+                    <Link href="/jobs" className={linkClass('/jobs')}>Roles</Link>
                     {!user && <Link href="/register" className={linkClass('/register')}>Register</Link>}
 
                     {role?.toUpperCase() === 'CANDIDATE' && <Link href="/candidate/dashboard" className={linkClass('/candidate')}>Dashboard</Link>}

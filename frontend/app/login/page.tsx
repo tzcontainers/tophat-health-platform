@@ -48,10 +48,10 @@ export default function LoginPage() {
         <main className="auth-page">
             <section className="auth-visual">
                 <div>
-                    <div className="eyebrow">Secure portal access</div>
-                    <h1>Clinical staffing operations with one controlled sign-in.</h1>
+                    <div className="eyebrow">Secure workspace access</div>
+                    <h1>Sign in to your healthcare staffing workspace.</h1>
                     <p>
-                        Candidates, clients, and administrators enter the same platform and land in the workspace that matches their backend role.
+                        Use one secure account to manage roles, compliance, placements, approvals, and timesheets based on your access level.
                     </p>
                 </div>
                 <div className="auth-proof-grid">
