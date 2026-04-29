@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {apiGet} from '@/lib/api';
 import {ContactRequestForm} from '@/components/ContactRequestForm';
+import {PaginatedJobs} from '@/lib/jobs';
 
 type Job = {
     id: string | number;
@@ -14,8 +15,8 @@ type Job = {
 
 async function getFeaturedJobs(): Promise<{jobs: Job[]; error: string | null}> {
     try {
-        const jobs = await apiGet<Job[]>('/api/v1/public/jobs');
-        return {jobs: jobs.slice(0, 3), error: null};
+        const jobs = await apiGet<PaginatedJobs>('/api/v1/public/jobs?page=0&size=3');
+        return {jobs: jobs.items, error: null};
     } catch {
         return {
             jobs: [],

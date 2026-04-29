@@ -1,9 +1,11 @@
 package com.tophat.health.web;
 
 import com.tophat.health.common.ApiEnvelope;
+import com.tophat.health.domain.enums.JobStatus;
 import com.tophat.health.service.AdminService;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,8 +31,17 @@ public class AdminController {
     }
 
     @GetMapping("/jobs")
-    public ApiEnvelope<List<Map<String, Object>>> jobs() {
-        return ApiEnvelope.of(adminService.jobs());
+    public ApiEnvelope<Map<String, Object>> jobs(@RequestParam(required = false) String search,
+            @RequestParam(required = false) String discipline,
+            @RequestParam(required = false) String band,
+            @RequestParam(required = false) String employmentType,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) BigDecimal minPay,
+            @RequestParam(required = false) BigDecimal maxPay,
+            @RequestParam(required = false) JobStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiEnvelope.of(adminService.jobs(search, discipline, band, employmentType, location, minPay, maxPay, status, page, size));
     }
 
     @PostMapping("/jobs")
@@ -76,6 +87,11 @@ public class AdminController {
     @PatchMapping("/users/{userId}/role")
     public ApiEnvelope<Map<String, Object>> updateUserRole(@PathVariable UUID userId, @RequestBody Map<String, String> payload) {
         return ApiEnvelope.of(adminService.updateUserRole(userId, payload.get("role")));
+    }
+
+    @PatchMapping("/users/{userId}/preferences")
+    public ApiEnvelope<Map<String, Object>> updateUserPreferences(@PathVariable UUID userId, @RequestBody Map<String, Object> payload) {
+        return ApiEnvelope.of(adminService.updateUserPreferences(userId, payload));
     }
 
     @PostMapping("/users/{userId}/make-admin")

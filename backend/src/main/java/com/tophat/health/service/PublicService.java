@@ -9,18 +9,17 @@ import com.tophat.health.domain.Client;
 import com.tophat.health.domain.User;
 import com.tophat.health.domain.enums.CandidateStatus;
 import com.tophat.health.domain.enums.ClientStatus;
+import com.tophat.health.domain.enums.JobStatus;
 import com.tophat.health.domain.enums.Role;
 import com.tophat.health.repository.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,6 +32,7 @@ public class PublicService {
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JobSearchService jobSearchService;
 
     public PublicService(JobPostingRepository jobPostingRepository,
             CandidateRepository candidateRepository,
@@ -40,7 +40,8 @@ public class PublicService {
             ContactRequestRepository contactRequestRepository,
             ClientRepository clientRepository,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JobSearchService jobSearchService) {
         this.jobPostingRepository = jobPostingRepository;
         this.candidateRepository = candidateRepository;
         this.candidateProfileRepository = candidateProfileRepository;
@@ -48,25 +49,14 @@ public class PublicService {
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jobSearchService = jobSearchService;
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> listJobs(String search, String discipline, String location) {
-        return jobPostingRepository.findAll()
-                                   .stream()
-                                   .filter(job -> search == null || search.isBlank() || job.getTitle()
-                                                                                           .toLowerCase()
-                                                                                           .contains(search.toLowerCase()) || job.getDescription()
-                                                                                                                                 .toLowerCase()
-                                                                                                                                 .contains(search.toLowerCase()))
-                                   .filter(job -> discipline == null || discipline.isBlank() || job.getDiscipline()
-                                                                                                   .equalsIgnoreCase(discipline))
-                                   .filter(job -> location == null || location.isBlank() || (job.getLocationText() != null && job.getLocationText()
-                                                                                                                                 .toLowerCase()
-                                                                                                                                 .contains(location.toLowerCase())))
-                                   .sorted(Comparator.comparing(JobPosting::getPublishedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-                                   .map(this::toJobSummary)
-                                   .collect(Collectors.toList());
+    public Map<String, Object> listJobs(String search, String discipline, String band, String employmentType,
+            String location, BigDecimal minPay, BigDecimal maxPay, int page, int size) {
+        return jobSearchService.search(new JobSearchCriteria(search, discipline, band, employmentType, location,
+                minPay, maxPay, JobStatus.PUBLISHED, null, page, size));
     }
 
     @Transactional(readOnly = true)
@@ -155,21 +145,5 @@ public class PublicService {
 
     private Object value(Object value) {
         return value == null ? "" : value;
-    }
-
-    private Map<String, Object> toJobSummary(JobPosting job) {
-        return Map.of(
-                "id", job.getId(),
-                "title", job.getTitle(),
-                "discipline", job.getDiscipline(),
-                "band", value(job.getBand()),
-                "employmentType", job.getEmploymentType(),
-                "location", value(job.getLocationText()),
-                "payRateMin", value(job.getPayRateMin()),
-                "payRateMax", value(job.getPayRateMax()),
-                "status", job.getVacancyStatus(),
-                "clientName", job.getClient()
-                                 .getName()
-        );
     }
 }

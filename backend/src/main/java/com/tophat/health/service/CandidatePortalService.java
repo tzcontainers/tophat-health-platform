@@ -3,6 +3,7 @@ package com.tophat.health.service;
 import com.tophat.health.common.NotFoundException;
 import com.tophat.health.domain.*;
 import com.tophat.health.domain.enums.DocumentStatus;
+import com.tophat.health.domain.enums.JobStatus;
 import com.tophat.health.domain.enums.ScanStatus;
 import com.tophat.health.domain.enums.TimesheetStatus;
 import com.tophat.health.repository.*;
@@ -28,6 +29,7 @@ public class CandidatePortalService {
     private final PlacementRepository placementRepository;
     private final TimesheetRepository timesheetRepository;
     private final FileStorageService fileStorageService;
+    private final JobSearchService jobSearchService;
 
     public CandidatePortalService(CandidateRepository candidateRepository,
             CandidateProfileRepository candidateProfileRepository,
@@ -36,7 +38,8 @@ public class CandidatePortalService {
             ComplianceRequirementRepository complianceRequirementRepository,
             PlacementRepository placementRepository,
             TimesheetRepository timesheetRepository,
-            FileStorageService fileStorageService) {
+            FileStorageService fileStorageService,
+            JobSearchService jobSearchService) {
         this.candidateRepository = candidateRepository;
         this.candidateProfileRepository = candidateProfileRepository;
         this.candidateAvailabilityRepository = candidateAvailabilityRepository;
@@ -45,6 +48,7 @@ public class CandidatePortalService {
         this.placementRepository = placementRepository;
         this.timesheetRepository = timesheetRepository;
         this.fileStorageService = fileStorageService;
+        this.jobSearchService = jobSearchService;
     }
 
     @Transactional(readOnly = true)
@@ -137,6 +141,22 @@ public class CandidatePortalService {
         }
         return Map.of("id", availability.getId(), "availableFrom", availability.getAvailableFrom(), "availabilityType",
                 availability.getAvailabilityType());
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> matchedJobs(UUID candidateId, String search, String discipline, String band,
+            String employmentType, String location, BigDecimal minPay, BigDecimal maxPay, int page, int size) {
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new NotFoundException("Candidate not found"));
+        CandidateProfile profile = candidateProfileRepository.findById(candidate.getId())
+                .orElse(null);
+
+        String effectiveDiscipline = firstText(discipline, profile != null ? profile.getPrimaryDiscipline() : null);
+        String effectiveBand = firstText(band, profile != null ? profile.getBand() : null);
+        String effectiveLocation = firstText(location, profile != null ? profile.getCurrentLocation() : null);
+
+        return jobSearchService.search(new JobSearchCriteria(search, effectiveDiscipline, effectiveBand,
+                employmentType, effectiveLocation, minPay, maxPay, JobStatus.PUBLISHED, null, page, size));
     }
 
     @Transactional(readOnly = true)
@@ -308,5 +328,12 @@ public class CandidatePortalService {
 
     private Object value(Object value) {
         return value == null ? "" : value;
+    }
+
+    private String firstText(String preferred, String fallback) {
+        if (preferred != null && !preferred.isBlank()) {
+            return preferred;
+        }
+        return fallback;
     }
 }

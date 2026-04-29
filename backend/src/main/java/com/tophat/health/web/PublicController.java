@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,10 +23,16 @@ public class PublicController {
     }
 
     @GetMapping("/jobs")
-    public ApiEnvelope<List<Map<String, Object>>> jobs(@RequestParam(required = false) String search,
+    public ApiEnvelope<Map<String, Object>> jobs(@RequestParam(required = false) String search,
             @RequestParam(required = false) String discipline,
-            @RequestParam(required = false) String location) {
-        return ApiEnvelope.of(publicService.listJobs(search, discipline, location));
+            @RequestParam(required = false) String band,
+            @RequestParam(required = false) String employmentType,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) BigDecimal minPay,
+            @RequestParam(required = false) BigDecimal maxPay,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+        return ApiEnvelope.of(publicService.listJobs(search, discipline, band, employmentType, location, minPay, maxPay, page, size));
     }
 
     @GetMapping("/jobs/{jobId}")

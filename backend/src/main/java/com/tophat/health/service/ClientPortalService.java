@@ -5,17 +5,18 @@ import com.tophat.health.domain.Client;
 import com.tophat.health.domain.ClientSite;
 import com.tophat.health.domain.Timesheet;
 import com.tophat.health.domain.VacancyRequest;
+import com.tophat.health.domain.enums.JobStatus;
 import com.tophat.health.domain.enums.TimesheetStatus;
 import com.tophat.health.domain.enums.VacancyRequestStatus;
 import com.tophat.health.repository.ClientRepository;
 import com.tophat.health.repository.ClientSiteRepository;
-import com.tophat.health.repository.JobPostingRepository;
 import com.tophat.health.repository.PlacementRepository;
 import com.tophat.health.repository.TimesheetRepository;
 import com.tophat.health.repository.VacancyRequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,20 +27,20 @@ import java.util.stream.Collectors;
 @Transactional
 public class ClientPortalService {
 
-    private final JobPostingRepository jobPostingRepository;
+    private final JobSearchService jobSearchService;
     private final ClientRepository clientRepository;
     private final ClientSiteRepository clientSiteRepository;
     private final PlacementRepository placementRepository;
     private final TimesheetRepository timesheetRepository;
     private final VacancyRequestRepository vacancyRequestRepository;
 
-    public ClientPortalService(JobPostingRepository jobPostingRepository,
+    public ClientPortalService(JobSearchService jobSearchService,
             ClientRepository clientRepository,
             ClientSiteRepository clientSiteRepository,
             PlacementRepository placementRepository,
             TimesheetRepository timesheetRepository,
             VacancyRequestRepository vacancyRequestRepository) {
-        this.jobPostingRepository = jobPostingRepository;
+        this.jobSearchService = jobSearchService;
         this.clientRepository = clientRepository;
         this.clientSiteRepository = clientSiteRepository;
         this.placementRepository = placementRepository;
@@ -48,18 +49,10 @@ public class ClientPortalService {
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> jobs(UUID clientId) {
-        return jobPostingRepository.findByClientId(clientId)
-                                   .stream()
-                                   .map(job -> Map.of(
-                                           "id", job.getId(),
-                                           "title", job.getTitle(),
-                                           "discipline", job.getDiscipline(),
-                                           "band", value(job.getBand()),
-                                           "location", value(job.getLocationText()),
-                                           "status", job.getVacancyStatus()
-                                   ))
-                                   .collect(Collectors.toList());
+    public Map<String, Object> jobs(UUID clientId, String search, String discipline, String band, String employmentType,
+            String location, BigDecimal minPay, BigDecimal maxPay, JobStatus status, int page, int size) {
+        return jobSearchService.search(new JobSearchCriteria(search, discipline, band, employmentType, location,
+                minPay, maxPay, status, clientId, page, size));
     }
 
     public Map<String, Object> createVacancyRequest(UUID clientId, UUID siteId, String title, String discipline, String band, String shiftPattern, String notes) {

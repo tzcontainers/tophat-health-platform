@@ -1,6 +1,5 @@
 {
-  "/candidate/compliance/page": "app/candidate/compliance/page.js",
-  "/candidate/dashboard/page": "app/candidate/dashboard/page.js",
-  "/candidate/profile/page": "app/candidate/profile/page.js",
-  "/page": "app/page.js"
+  "/jobs/[jobId]/page": "app/jobs/[jobId]/page.js",
+  "/page": "app/page.js",
+  "/register/page": "app/register/page.js"
 }
