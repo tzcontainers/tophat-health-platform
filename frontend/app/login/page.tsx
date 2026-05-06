@@ -1,7 +1,7 @@
 'use client';
 import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 import { apiJson } from '@/lib/api';
-import { AuthSession, routeForRole, saveAuthSession } from '@/lib/auth';
+import { AuthSession, notifyAuthChanged, routeForRole } from '@/lib/auth';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -9,6 +9,14 @@ export default function LoginPage() {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    function targetPath(role: string) {
+        if (typeof window === 'undefined') {
+            return routeForRole(role);
+        }
+
+        return new URLSearchParams(window.location.search).get('redirect') || routeForRole(role);
+    }
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -24,8 +32,8 @@ export default function LoginPage() {
                 password
             }, 'public');
 
-            saveAuthSession({ ...result, username: result.username || username });
-            router.push(routeForRole(result.role));
+            notifyAuthChanged();
+            router.push(targetPath(result.role));
             router.refresh();
         } catch (error) {
             setMessage(error instanceof Error ? error.message : 'Login failed');
@@ -35,8 +43,8 @@ export default function LoginPage() {
     }
 
     const onGoogleSuccess = useCallback((session: AuthSession) => {
-        saveAuthSession(session);
-        router.push(routeForRole(session.role));
+        notifyAuthChanged();
+        router.push(targetPath(session.role));
         router.refresh();
     }, [router]);
 

@@ -15,18 +15,8 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 const SERVER_API_BASE_URL = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.BACKEND_API_BASE_URL || __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 const BROWSER_API_BASE_URL = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_BASE_URL || '';
-function getAuthToken() {
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
-    ;
-    return localStorage.getItem('th_token');
-}
 function headers(area) {
-    const base = {};
-    const token = getAuthToken();
-    if (token) {
-        base['Authorization'] = `Bearer ${token}`;
-    }
-    return base;
+    return {};
 }
 async function parse(response) {
     if (!response.ok) {
@@ -40,10 +30,30 @@ async function parse(response) {
     const envelope = await response.json();
     return envelope.data;
 }
-async function apiFetch(path, init) {
+async function attemptRefresh() {
+    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+    ;
+    const response = await fetch('/api/v1/auth/refresh', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    });
+    return response.ok;
+}
+async function apiFetch(path, init, area, allowRefresh = true) {
     const apiBaseUrl = ("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : BROWSER_API_BASE_URL;
     try {
-        return await fetch(`${apiBaseUrl}${path}`, init);
+        const response = await fetch(`${apiBaseUrl}${path}`, {
+            ...init,
+            credentials: 'same-origin'
+        });
+        if (response.status === 401 && area !== 'public' && allowRefresh && await attemptRefresh()) {
+            return apiFetch(path, init, area, false);
+        }
+        return response;
     } catch  {
         throw new Error(`Could not connect to the API at ${apiBaseUrl || 'the frontend API proxy'}. Start the backend or update BACKEND_API_BASE_URL.`);
     }
@@ -52,7 +62,7 @@ async function apiGet(path, area = 'public') {
     const response = await apiFetch(path, {
         cache: 'no-store',
         headers: headers(area)
-    });
+    }, area);
     return parse(response);
 }
 async function apiJson(path, method, body, area) {
@@ -63,14 +73,14 @@ async function apiJson(path, method, body, area) {
             ...headers(area)
         },
         body: JSON.stringify(body)
-    });
+    }, area);
     return parse(response);
 }
 async function apiDelete(path, area) {
     const response = await apiFetch(path, {
         method: 'DELETE',
         headers: headers(area)
-    });
+    }, area);
     return parse(response);
 }
 async function apiForm(path, formData, area) {
@@ -78,7 +88,7 @@ async function apiForm(path, formData, area) {
         method: 'POST',
         headers: headers(area),
         body: formData
-    });
+    }, area);
     return parse(response);
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
@@ -135,7 +145,7 @@ function ContactRequestForm() {
                         style: {
                             margin: 0
                         },
-                        children: "Contact requests"
+                        children: "Speak with our team"
                     }, void 0, false, {
                         fileName: "[project]/components/ContactRequestForm.tsx",
                         lineNumber: 37,
@@ -143,7 +153,7 @@ function ContactRequestForm() {
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         className: "badge",
-                        children: "Care team"
+                        children: "Support"
                     }, void 0, false, {
                         fileName: "[project]/components/ContactRequestForm.tsx",
                         lineNumber: 38,
@@ -197,7 +207,7 @@ function ContactRequestForm() {
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
                 className: "textarea",
                 name: "message",
-                placeholder: "Message"
+                placeholder: "How can we help?"
             }, void 0, false, {
                 fileName: "[project]/components/ContactRequestForm.tsx",
                 lineNumber: 45,
@@ -206,7 +216,7 @@ function ContactRequestForm() {
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                 className: "btn",
                 disabled: loading,
-                children: loading ? 'Sending...' : 'Send request'
+                children: loading ? 'Sending...' : 'Send message'
             }, void 0, false, {
                 fileName: "[project]/components/ContactRequestForm.tsx",
                 lineNumber: 46,

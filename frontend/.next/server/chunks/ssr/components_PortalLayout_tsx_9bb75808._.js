@@ -1,0 +1,3 @@
+module.exports=[61321,a=>{"use strict";var b=a.i(87924),c=a.i(38246),d=a.i(50944);function e({title:a,subtitle:e,links:f,children:g}){let h=(0,d.usePathname)();return(0,b.jsxs)("main",{className:"portal-layout",children:[(0,b.jsxs)("aside",{className:"card sidebar",children:[(0,b.jsxs)("div",{className:"sidebar-heading",children:[(0,b.jsx)("h3",{style:{margin:0},children:a}),(0,b.jsx)("p",{className:"muted",style:{marginBottom:0},children:e})]}),(0,b.jsx)("nav",{className:"sidebar-nav",children:f.map(a=>(0,b.jsx)(c.default,{href:a.href,className:h===a.href?"active":"",children:a.label},a.href))})]}),(0,b.jsx)("section",{children:g})]})}a.s(["PortalLayout",()=>e])}];
+
+//# sourceMappingURL=components_PortalLayout_tsx_9bb75808._.js.map

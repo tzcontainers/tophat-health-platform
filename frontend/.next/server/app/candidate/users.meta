@@ -1,0 +1,18 @@
+{
+  "status": 307,
+  "headers": {
+    "location": "/admin/users",
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/candidate/layout,_N_T_/candidate/users/layout,_N_T_/candidate/users/page,_N_T_/candidate/users"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/candidate/users/__PAGE__",
+    "/candidate/users",
+    "/candidate",
+    "/_index",
+    "/_head"
+  ]
+}

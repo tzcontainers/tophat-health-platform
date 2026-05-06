@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/candidate/layout,_N_T_/candidate/timesheets/layout,_N_T_/candidate/timesheets/page,_N_T_/candidate/timesheets"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/candidate/timesheets/__PAGE__",
+    "/candidate/timesheets",
+    "/candidate",
+    "/_index",
+    "/_head"
+  ]
+}

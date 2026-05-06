@@ -74,6 +74,16 @@ public class AdminController {
         return ApiEnvelope.of(adminService.complianceReport());
     }
 
+    @GetMapping("/clients")
+    public ApiEnvelope<List<Map<String, Object>>> clients() {
+        return ApiEnvelope.of(adminService.clients());
+    }
+
+    @GetMapping("/clients/{clientId}/sites")
+    public ApiEnvelope<List<Map<String, Object>>> clientSites(@PathVariable UUID clientId) {
+        return ApiEnvelope.of(adminService.clientSites(clientId));
+    }
+
     @GetMapping("/users")
     public ApiEnvelope<List<Map<String, Object>>> users() {
         return ApiEnvelope.of(adminService.users());

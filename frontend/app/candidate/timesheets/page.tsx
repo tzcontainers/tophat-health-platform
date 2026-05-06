@@ -3,20 +3,23 @@ import {apiGet, apiJson} from '@/lib/api';
 import {useQuery} from '@tanstack/react-query';
 import {useState} from 'react';
 
-const seedPlacementId = '00000000-0000-0000-0000-000000000601';
-
 export default function CandidateTimesheetsPage() {
     const {data, refetch} = useQuery({
         queryKey: ['candidate-timesheets-page'],
         queryFn: () => apiGet<any[]>('/api/v1/candidates/me/timesheets', 'candidate')
+    });
+    const placements = useQuery({
+        queryKey: ['candidate-timesheet-placements'],
+        queryFn: () => apiGet<any[]>('/api/v1/candidates/me/placements', 'candidate')
     });
     const [message, setMessage] = useState('');
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
+        const placementId = form.get('placementId');
         await apiJson('/api/v1/candidates/me/timesheets', 'POST', {
-            placementId: seedPlacementId,
+            placementId,
             weekCommencing: form.get('weekCommencing'),
             lines: [
                 {
@@ -39,6 +42,14 @@ export default function CandidateTimesheetsPage() {
                 <div className="section-title"><h1 style={{margin: 0}}>Timesheets</h1><span
                     className="badge">Shift submission</span></div>
                 <div className="form-grid">
+                    <select className="select" name="placementId" required data-testid="timesheet-placement-select">
+                        <option value="">Select placement</option>
+                        {placements.data?.map((placement) => (
+                            <option key={placement.id} value={placement.id}>
+                                {placement.jobTitle} · {placement.clientName}
+                            </option>
+                        ))}
+                    </select>
                     <input className="input" type="date" name="weekCommencing" required/>
                     <input className="input" type="date" name="shiftDate" required/>
                     <input className="input" type="time" name="startTime" required/>

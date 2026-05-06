@@ -1,0 +1,18 @@
+{
+  "status": 307,
+  "headers": {
+    "location": "/admin/teams",
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/candidate/layout,_N_T_/candidate/teams/layout,_N_T_/candidate/teams/page,_N_T_/candidate/teams"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/candidate/teams/__PAGE__",
+    "/candidate/teams",
+    "/candidate",
+    "/_index",
+    "/_head"
+  ]
+}

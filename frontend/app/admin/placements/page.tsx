@@ -1,9 +1,28 @@
 'use client';
-import {apiJson} from '@/lib/api';
+import {apiGet, apiJson} from '@/lib/api';
+import {useQuery} from '@tanstack/react-query';
 import {useState} from 'react';
 
 export default function AdminPlacementsPage() {
     const [message, setMessage] = useState('');
+    const candidates = useQuery({
+        queryKey: ['admin-placement-candidates'],
+        queryFn: () => apiGet<any[]>('/api/v1/admin/candidates', 'admin')
+    });
+    const jobs = useQuery({
+        queryKey: ['admin-placement-jobs'],
+        queryFn: () => apiGet<any>('/api/v1/admin/jobs?page=0&size=100', 'admin')
+    });
+    const clients = useQuery({
+        queryKey: ['admin-placement-clients'],
+        queryFn: () => apiGet<any[]>('/api/v1/admin/clients', 'admin')
+    });
+    const [selectedClientId, setSelectedClientId] = useState('');
+    const sites = useQuery({
+        queryKey: ['admin-placement-sites', selectedClientId],
+        queryFn: () => apiGet<any[]>(`/api/v1/admin/clients/${selectedClientId}/sites`, 'admin'),
+        enabled: !!selectedClientId
+    });
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -29,10 +48,45 @@ export default function AdminPlacementsPage() {
                 <div className="section-title"><h1 style={{margin: 0}}>Create placement</h1><span className="badge">Placement setup</span>
                 </div>
                 <div className="form-grid">
-                    <input className="input" name="candidateId" defaultValue="00000000-0000-0000-0000-000000000201"/>
-                    <input className="input" name="jobId" defaultValue="00000000-0000-0000-0000-000000000101"/>
-                    <input className="input" name="clientId" defaultValue="00000000-0000-0000-0000-000000000301"/>
-                    <input className="input" name="siteId" defaultValue="00000000-0000-0000-0000-000000000302"/>
+                    <select className="select" name="candidateId" required data-testid="admin-placement-candidate-select">
+                        <option value="">Select candidate</option>
+                        {candidates.data?.map((candidate) => (
+                            <option key={candidate.id} value={candidate.id}>
+                                {candidate.name}
+                            </option>
+                        ))}
+                    </select>
+                    <select className="select" name="jobId" required data-testid="admin-placement-job-select">
+                        <option value="">Select role</option>
+                        {jobs.data?.items?.map((job: any) => (
+                            <option key={job.id} value={job.id}>
+                                {job.title}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        className="select"
+                        name="clientId"
+                        value={selectedClientId}
+                        onChange={(event) => setSelectedClientId(event.target.value)}
+                        required
+                        data-testid="admin-placement-client-select"
+                    >
+                        <option value="">Select client</option>
+                        {clients.data?.map((client) => (
+                            <option key={client.id} value={client.id}>
+                                {client.name}
+                            </option>
+                        ))}
+                    </select>
+                    <select className="select" name="siteId" required data-testid="admin-placement-site-select">
+                        <option value="">Select site</option>
+                        {sites.data?.map((site) => (
+                            <option key={site.id} value={site.id}>
+                                {site.siteName}
+                            </option>
+                        ))}
+                    </select>
                     <input className="input" name="consultantName" defaultValue="TopHat Consultant"/>
                     <input className="input" type="date" name="startDate" required/>
                     <input className="input" type="date" name="endDate"/>

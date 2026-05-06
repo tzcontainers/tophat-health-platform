@@ -146,6 +146,20 @@ public class ClientPortalService {
         return Map.of("id", timesheet.getId(), "status", timesheet.getSubmissionStatus(), "rejectedAt", timesheet.getRejectedAt(), "comment", timesheet.getApprovalComment());
     }
 
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> sites(UUID clientId) {
+        return clientSiteRepository.findByClientId(clientId)
+                .stream()
+                .map(site -> Map.of(
+                        "id", site.getId(),
+                        "siteName", site.getSiteName(),
+                        "city", value(site.getCity()),
+                        "postcode", value(site.getPostcode()),
+                        "active", site.isActive()
+                ))
+                .collect(Collectors.toList());
+    }
+
     private Object value(Object value) {
         return value == null ? "" : value;
     }

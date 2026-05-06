@@ -55,6 +55,7 @@ Open:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
+- Actuator health: http://localhost:8080/actuator/health
 
 ## Running without Docker
 
@@ -86,6 +87,21 @@ cd frontend
 npm install
 npm run dev
 ```
+
+## E2E testing
+
+The Playwright suite expects PostgreSQL to be running locally on `localhost:5432` with the seeded development
+database values. The easiest local setup is:
+
+```bash
+docker compose up -d postgres
+cd frontend
+npm run test:e2e:install
+npm run test:e2e
+```
+
+The Playwright config starts the backend and frontend automatically. In CI, the workflow provisions PostgreSQL as a
+service and runs the same commands.
 
 ## Seeded development identities
 

@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/candidate/layout,_N_T_/candidate/compliance/layout,_N_T_/candidate/compliance/page,_N_T_/candidate/compliance"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/candidate/compliance/__PAGE__",
+    "/candidate/compliance",
+    "/candidate",
+    "/_index",
+    "/_head"
+  ]
+}

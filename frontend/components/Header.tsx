@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { clearAuthSession } from '@/lib/auth';
+import { clearAuthSession, fetchAuthSession, normalizeRole } from '@/lib/auth';
 
 export function Header() {
     const [user, setUser] = useState<string | null>(null);
@@ -12,32 +12,42 @@ export function Header() {
     const pathname = usePathname();
 
     useEffect(() => {
-        function syncSession() {
-            const storedUser = localStorage.getItem('th_user');
-            const storedRole = localStorage.getItem('th_role');
-            setUser(storedUser);
-            setRole(storedRole);
+        async function syncSession() {
+            try {
+                const session = await fetchAuthSession();
+                setUser(session?.username ?? null);
+                setRole(session?.role ?? null);
+            } catch {
+                setUser(null);
+                setRole(null);
+            }
         }
 
-        syncSession();
-        window.addEventListener('th-auth-change', syncSession);
-        window.addEventListener('storage', syncSession);
+        void syncSession();
+        const sync = () => {
+            void syncSession();
+        };
+        window.addEventListener('th-auth-change', sync);
 
         return () => {
-            window.removeEventListener('th-auth-change', syncSession);
-            window.removeEventListener('storage', syncSession);
+            window.removeEventListener('th-auth-change', sync);
         };
     }, []);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('th_user');
-        const storedRole = localStorage.getItem('th_role');
-        setUser(storedUser);
-        setRole(storedRole);
+        void fetchAuthSession()
+            .then((session) => {
+                setUser(session?.username ?? null);
+                setRole(session?.role ?? null);
+            })
+            .catch(() => {
+                setUser(null);
+                setRole(null);
+            });
     }, [pathname]);
 
-    const logout = () => {
-        clearAuthSession();
+    const logout = async () => {
+        await clearAuthSession();
         setUser(null);
         setRole(null);
         router.push('/');
@@ -66,9 +76,9 @@ export function Header() {
                     <Link href="/jobs" className={linkClass('/jobs')}>Roles</Link>
                     {!user && <Link href="/register" className={linkClass('/register')}>Register</Link>}
 
-                    {role?.toUpperCase() === 'CANDIDATE' && <Link href="/candidate/dashboard" className={linkClass('/candidate')}>Dashboard</Link>}
-                    {(role?.toUpperCase() === 'CLIENT_ADMIN' || role?.toUpperCase() === 'CLIENT') && <Link href="/client/dashboard" className={linkClass('/client')}>Dashboard</Link>}
-                    {role?.toUpperCase() === 'ADMIN' && <Link href="/admin/dashboard" className={linkClass('/admin')}>Admin</Link>}
+                    {normalizeRole(role) === 'CANDIDATE' && <Link href="/candidate/dashboard" className={linkClass('/candidate')}>Dashboard</Link>}
+                    {(normalizeRole(role) === 'CLIENT_ADMIN' || normalizeRole(role) === 'CLIENT') && <Link href="/client/dashboard" className={linkClass('/client')}>Dashboard</Link>}
+                    {normalizeRole(role) === 'ADMIN' && <Link href="/admin/dashboard" className={linkClass('/admin')}>Admin</Link>}
 
                     {user ? (
                         <div className="nav-actions">

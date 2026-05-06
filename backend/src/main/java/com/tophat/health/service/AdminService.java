@@ -270,6 +270,33 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
+    public List<Map<String, Object>> clients() {
+        return clientRepository.findAll()
+                .stream()
+                .map(client -> Map.of(
+                        "id", client.getId(),
+                        "name", client.getName(),
+                        "status", client.getStatus(),
+                        "clientCode", client.getClientCode()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> clientSites(UUID clientId) {
+        return clientSiteRepository.findByClientId(clientId)
+                .stream()
+                .map(site -> Map.of(
+                        "id", site.getId(),
+                        "siteName", site.getSiteName(),
+                        "city", value(site.getCity()),
+                        "postcode", value(site.getPostcode()),
+                        "active", site.isActive()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> users() {
         return userRepository.findAll()
                 .stream()

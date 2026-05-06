@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[88786,["/_next/static/chunks/9270920b6267f23c.js","/_next/static/chunks/78228e7b62d57128.js","/_next/static/chunks/679a468fdd254156.js"],"PortalLayout"]
+3:I[39756,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"default"]
+4:I[37457,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"default"]
+0:{"buildId":"0PyOTA4GAunT6T1bqwG6A","rsc":["$","$1","c",{"children":[[["$","script","script-0",{"src":"/_next/static/chunks/679a468fdd254156.js","async":true}]],["$","$L2",null,{"title":"Client workspace","subtitle":"Role requests, placements, and approvals","links":[{"href":"/client/dashboard","label":"Dashboard"},{"href":"/client/vacancy-requests","label":"Role requests"},{"href":"/client/placements","label":"Placements"},{"href":"/client/timesheets","label":"Timesheets"}],"children":["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]}]]}],"loading":null,"isPartial":false}

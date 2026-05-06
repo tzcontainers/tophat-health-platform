@@ -5,9 +5,6 @@ import {buildJobQuery, emptyJobsPage, PaginatedJobs} from '@/lib/jobs';
 import {PaginationControls} from '@/components/PaginationControls';
 import {useMemo, useState} from 'react';
 
-const clientId = '00000000-0000-0000-0000-000000000301';
-const siteId = '00000000-0000-0000-0000-000000000302';
-
 export default function AdminJobsPage() {
     const [search, setSearch] = useState('');
     const [discipline, setDiscipline] = useState('');
@@ -27,6 +24,16 @@ export default function AdminJobsPage() {
         queryKey: ['admin-jobs-page', queryString],
         queryFn: () => apiGet<PaginatedJobs>(`/api/v1/admin/jobs${queryString}`, 'admin')
     });
+    const clients = useQuery({
+        queryKey: ['admin-job-clients'],
+        queryFn: () => apiGet<any[]>('/api/v1/admin/clients', 'admin')
+    });
+    const [selectedClientId, setSelectedClientId] = useState('');
+    const sites = useQuery({
+        queryKey: ['admin-job-sites', selectedClientId],
+        queryFn: () => apiGet<any[]>(`/api/v1/admin/clients/${selectedClientId}/sites`, 'admin'),
+        enabled: !!selectedClientId
+    });
     const [message, setMessage] = useState('');
     const jobsPage = data || emptyJobsPage(pageSize);
 
@@ -39,8 +46,8 @@ export default function AdminJobsPage() {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
         await apiJson('/api/v1/admin/jobs', 'POST', {
-            clientId,
-            siteId,
+            clientId: form.get('clientId'),
+            siteId: form.get('siteId'),
             title: form.get('title'),
             discipline: form.get('discipline'),
             band: form.get('band'),
@@ -73,6 +80,29 @@ export default function AdminJobsPage() {
                 <div className="section-title"><h1 style={{margin: 0}}>Manage roles</h1><span className="badge">{jobsPage.totalItems} roles</span>
                 </div>
                 <div className="form-grid">
+                    <select
+                        className="select"
+                        name="clientId"
+                        value={selectedClientId}
+                        onChange={(event) => setSelectedClientId(event.target.value)}
+                        required
+                        data-testid="admin-job-client-select"
+                    >
+                        <option value="">Select client</option>
+                        {clients.data?.map((client) => (
+                            <option key={client.id} value={client.id}>
+                                {client.name}
+                            </option>
+                        ))}
+                    </select>
+                    <select className="select" name="siteId" required data-testid="admin-job-site-select">
+                        <option value="">Select site</option>
+                        {sites.data?.map((site) => (
+                            <option key={site.id} value={site.id}>
+                                {site.siteName}
+                            </option>
+                        ))}
+                    </select>
                     <input className="input" name="title" placeholder="Role title" required/>
                     <input className="input" name="discipline" placeholder="Discipline" required/>
                     <input className="input" name="band" placeholder="Band"/>

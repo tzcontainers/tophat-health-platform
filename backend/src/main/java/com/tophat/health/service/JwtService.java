@@ -16,6 +16,10 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    public static final String ACCESS_COOKIE_NAME = "th_access_token";
+    public static final String REFRESH_COOKIE_NAME = "th_refresh_token";
+    public static final String ROLE_COOKIE_NAME = "th_user_role";
+
     @Value("${app.security.jwt.secret:very-secret-key-that-should-be-at-least-thirty-two-characters-long}")
     private String secret;
 

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../app/candidate/teams/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation';\n\nexport default function CandidateTeamsRedirectPage() {\n    redirect('/admin/teams');\n}\n"],"names":[],"mappings":"wMAAA,EAAA,CAAA,CAAA,OAAA,IAAA,EAAA,EAAA,CAAA,CAAA,OAEe,SAAS,IACpB,CAAA,EAAA,EAAA,QAAA,AAAQ,EAAC,eACb"}

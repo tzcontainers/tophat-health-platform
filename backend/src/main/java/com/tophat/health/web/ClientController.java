@@ -57,6 +57,11 @@ public class ClientController {
         return ApiEnvelope.of(clientPortalService.placements(userDetails.getClientId()));
     }
 
+    @GetMapping("/sites")
+    public ApiEnvelope<List<Map<String, Object>>> sites(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiEnvelope.of(clientPortalService.sites(userDetails.getClientId()));
+    }
+
     @GetMapping("/timesheets/pending")
     public ApiEnvelope<List<Map<String, Object>>> pendingTimesheets(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiEnvelope.of(clientPortalService.pendingTimesheets(userDetails.getClientId()));
