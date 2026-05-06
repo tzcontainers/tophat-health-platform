@@ -34,16 +34,16 @@ export function ContactRequestForm() {
     return (
         <form className="card stack" onSubmit={onSubmit}>
             <div className="section-title">
-                <h2 style={{margin: 0}}>Contact requests</h2>
-                <span className="badge">Care team</span>
+                <h2 style={{margin: 0}}>Speak with our team</h2>
+                <span className="badge">Support</span>
             </div>
             <div className="form-grid">
                 <input className="input" name="name" placeholder="Name" required/>
                 <input className="input" name="email" type="email" placeholder="Email" required/>
                 <input className="input" name="phone" placeholder="Phone"/>
             </div>
-            <textarea className="textarea" name="message" placeholder="Message"/>
-            <button className="btn" disabled={loading}>{loading ? 'Sending...' : 'Send request'}</button>
+            <textarea className="textarea" name="message" placeholder="How can we help?"/>
+            <button className="btn" disabled={loading}>{loading ? 'Sending...' : 'Send message'}</button>
             {message && <div className="notice">{message}</div>}
         </form>
     );

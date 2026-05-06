@@ -23,7 +23,7 @@ export default async function JobDetailPage({params}: { params: Promise<{ jobId:
     try {
         job = await apiGet<Job>(`/api/v1/public/jobs/${jobId}`);
     } catch {
-        error = 'This vacancy is temporarily unavailable. Please return to the jobs list.';
+        error = 'This role is temporarily unavailable. Please return to the roles list.';
     }
 
     if (!job) {
@@ -31,9 +31,9 @@ export default async function JobDetailPage({params}: { params: Promise<{ jobId:
             <main className="page-section">
                 <div className="card stack">
                     <div className="badge">Role unavailable</div>
-                    <h1 style={{margin: 0}}>We could not load this vacancy</h1>
+                    <h1 style={{margin: 0}}>We could not load this role</h1>
                     <p className="muted">{error}</p>
-                    <Link className="btn secondary" href="/jobs">Back to jobs</Link>
+                    <Link className="btn secondary" href="/jobs">Back to roles</Link>
                 </div>
             </main>
         );
@@ -53,7 +53,7 @@ export default async function JobDetailPage({params}: { params: Promise<{ jobId:
                 <p style={{lineHeight: 1.7}}>{job.description}</p>
                 <div style={{display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
                     <Link className="btn" href="/register">Register interest</Link>
-                    <Link className="btn secondary" href="/jobs">Back to jobs</Link>
+                    <Link className="btn secondary" href="/jobs">Back to roles</Link>
                 </div>
             </div>
         </main>

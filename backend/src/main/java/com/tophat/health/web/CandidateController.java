@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,20 @@ public class CandidateController {
     @GetMapping("/compliance")
     public ApiEnvelope<Map<String, Object>> compliance(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiEnvelope.of(candidatePortalService.complianceDashboard(userDetails.getCandidateId()));
+    }
+
+    @GetMapping("/jobs/matches")
+    public ApiEnvelope<Map<String, Object>> matchedJobs(@AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String discipline,
+            @RequestParam(required = false) String band,
+            @RequestParam(required = false) String employmentType,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) BigDecimal minPay,
+            @RequestParam(required = false) BigDecimal maxPay,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {
+        return ApiEnvelope.of(candidatePortalService.matchedJobs(userDetails.getCandidateId(), search, discipline, band, employmentType, location, minPay, maxPay, page, size));
     }
 
     @PostMapping(value = "/documents", consumes = "multipart/form-data")

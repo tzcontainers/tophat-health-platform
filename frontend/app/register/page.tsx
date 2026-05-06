@@ -21,14 +21,14 @@ export default function RegisterPage() {
                     phone: form.get('phone'),
                     primaryDiscipline: form.get('primaryDiscipline')
                 }, 'public');
-                setMessage(`Candidate registration successful. Candidate number: ${result.candidateNumber}`);
+                setMessage(`Candidate profile created. Candidate number: ${result.candidateNumber}`);
             } else {
                 const result = await apiJson<any>('/api/v1/public/clients/register', 'POST', {
                     name: form.get('name'),
                     email: form.get('email'),
                     password: form.get('password')
                 }, 'public');
-                setMessage(`Client registration successful. Client code: ${result.clientCode}`);
+                setMessage(`Client workspace created. Client code: ${result.clientCode}`);
             }
             event.currentTarget.reset();
         } catch (error) {
@@ -42,11 +42,10 @@ export default function RegisterPage() {
         <main className="auth-page compact">
             <section className="auth-visual">
                 <div>
-                    <div className="eyebrow">Join TopHat</div>
-                    <h1>{role === 'candidate' ? 'Build your healthcare work profile.' : 'Open a client staffing workspace.'}</h1>
+                    <div className="eyebrow">Create your account</div>
+                    <h1>{role === 'candidate' ? 'Create a professional healthcare profile.' : 'Set up a client hiring workspace.'}</h1>
                     <p>
-                        Registration connects directly to the backend onboarding flow, creating the right account,
-                        role, and portal access for your next step.
+                        Start with the right access from day one, whether you are joining as a candidate or managing workforce requests for a care provider.
                     </p>
                 </div>
             </section>
@@ -71,7 +70,7 @@ export default function RegisterPage() {
 
                 <form className="stack" onSubmit={onSubmit}>
                     <div className="section-title">
-                        <h1 style={{margin: 0}}>{role === 'candidate' ? 'Candidate' : 'Client'} registration</h1>
+                        <h1 style={{margin: 0}}>{role === 'candidate' ? 'Candidate profile' : 'Client workspace'}</h1>
                     </div>
                     
                     <div className="form-grid">
@@ -81,7 +80,7 @@ export default function RegisterPage() {
                                 <input className="input" name="lastName" placeholder="Last name" required/>
                             </>
                         ) : (
-                            <input className="input" name="name" placeholder="Company Name" required style={{gridColumn: '1 / -1'}}/>
+                            <input className="input" name="name" placeholder="Company name" required style={{gridColumn: '1 / -1'}}/>
                         )}
                         <input className="input" name="email" type="email" placeholder="Email" required/>
                         <input className="input" name="password" type="password" placeholder="Password" required/>
@@ -95,7 +94,7 @@ export default function RegisterPage() {
                     </div>
                     
                     <button className="btn block" disabled={loading}>
-                        {loading ? 'Submitting...' : `Register ${role}`}
+                        {loading ? 'Submitting...' : role === 'candidate' ? 'Create profile' : 'Create workspace'}
                     </button>
                     {message && <div className="notice">{message}</div>}
                 </form>

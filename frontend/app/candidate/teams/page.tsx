@@ -93,7 +93,7 @@ export default function CandidateAdminTeamsPage() {
 
             {message && <div className="notice">{message}</div>}
 
-            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1.5rem', alignItems: 'start' }}>
+            <div className="grid-2" style={{ alignItems: 'start' }}>
                 <div className="stack">
                     <div className="card stack">
                         <h3>Create Team</h3>

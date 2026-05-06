@@ -29,8 +29,8 @@ export default function CandidateLayout({ children }: { children: React.ReactNod
 
     return (
         <PortalLayout 
-            title={role === 'ADMIN' ? "Candidate Portal (Admin)" : "Candidate portal"} 
-            subtitle={role === 'ADMIN' ? "Backend Management Enabled" : "Profile, compliance, placements, and timesheets"}
+            title={role === 'ADMIN' ? "Candidate Workspace (Admin)" : "Candidate workspace"} 
+            subtitle={role === 'ADMIN' ? "Backend management enabled" : "Profile, compliance, placements, and timesheets"}
             links={links}
         >
             {children}

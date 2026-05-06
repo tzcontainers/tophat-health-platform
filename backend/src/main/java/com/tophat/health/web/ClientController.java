@@ -2,10 +2,12 @@ package com.tophat.health.web;
 
 import com.tophat.health.common.ApiEnvelope;
 import com.tophat.health.common.CustomUserDetails;
+import com.tophat.health.domain.enums.JobStatus;
 import com.tophat.health.service.ClientPortalService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,8 +23,18 @@ public class ClientController {
     }
 
     @GetMapping("/jobs")
-    public ApiEnvelope<List<Map<String, Object>>> jobs(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiEnvelope.of(clientPortalService.jobs(userDetails.getClientId()));
+    public ApiEnvelope<Map<String, Object>> jobs(@AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String discipline,
+            @RequestParam(required = false) String band,
+            @RequestParam(required = false) String employmentType,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) BigDecimal minPay,
+            @RequestParam(required = false) BigDecimal maxPay,
+            @RequestParam(required = false) JobStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiEnvelope.of(clientPortalService.jobs(userDetails.getClientId(), search, discipline, band, employmentType, location, minPay, maxPay, status, page, size));
     }
 
     @PostMapping("/vacancy-requests")

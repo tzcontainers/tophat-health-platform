@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class AdminService {
 
     private final CandidateRepository candidateRepository;
+    private final CandidateProfileRepository candidateProfileRepository;
     private final JobPostingRepository jobPostingRepository;
     private final ClientRepository clientRepository;
     private final ClientSiteRepository clientSiteRepository;
@@ -35,8 +36,10 @@ public class AdminService {
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JobSearchService jobSearchService;
 
     public AdminService(CandidateRepository candidateRepository,
+                        CandidateProfileRepository candidateProfileRepository,
                         JobPostingRepository jobPostingRepository,
                         ClientRepository clientRepository,
                         ClientSiteRepository clientSiteRepository,
@@ -46,8 +49,10 @@ public class AdminService {
                         UserRepository userRepository,
                         TeamRepository teamRepository,
                         TeamMemberRepository teamMemberRepository,
-                        PasswordEncoder passwordEncoder) {
+                        PasswordEncoder passwordEncoder,
+                        JobSearchService jobSearchService) {
         this.candidateRepository = candidateRepository;
+        this.candidateProfileRepository = candidateProfileRepository;
         this.jobPostingRepository = jobPostingRepository;
         this.clientRepository = clientRepository;
         this.clientSiteRepository = clientSiteRepository;
@@ -58,6 +63,7 @@ public class AdminService {
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jobSearchService = jobSearchService;
     }
 
     @Transactional(readOnly = true)
@@ -102,20 +108,10 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> jobs() {
-        return jobPostingRepository.findAll()
-                .stream()
-                .map(job -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", job.getId());
-                    map.put("title", job.getTitle());
-                    map.put("discipline", job.getDiscipline());
-                    map.put("band", value(job.getBand()));
-                    map.put("status", job.getVacancyStatus());
-                    map.put("clientName", job.getClient().getName());
-                    return map;
-                })
-                .collect(Collectors.toList());
+    public Map<String, Object> jobs(String search, String discipline, String band, String employmentType,
+            String location, BigDecimal minPay, BigDecimal maxPay, JobStatus status, int page, int size) {
+        return jobSearchService.search(new JobSearchCriteria(search, discipline, band, employmentType, location,
+                minPay, maxPay, status, null, page, size));
     }
 
     public Map<String, Object> createJob(Map<String, Object> payload) {
@@ -277,14 +273,7 @@ public class AdminService {
     public List<Map<String, Object>> users() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", user.getId());
-                    map.put("username", user.getUsername());
-                    map.put("role", user.getRole().name()); // Fix: Use .name() for Enum
-                    map.put("createdAt", user.getCreatedAt() != null ? user.getCreatedAt().toString() : OffsetDateTime.now().toString());
-                    return map;
-                })
+                .map(this::userMap)
                 .collect(Collectors.toList());
     }
 
@@ -306,15 +295,83 @@ public class AdminService {
         user.setEmailVerified(true);
         userRepository.save(user);
 
-        return Map.of("id", user.getId(), "username", user.getUsername(), "role", user.getRole().name());
+        return userMap(user);
     }
 
     public Map<String, Object> updateUserRole(UUID userId, String role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new com.tophat.health.common.NotFoundException("User not found"));
-        user.setRole(Role.valueOf(role));
+        Role updatedRole = Role.valueOf(role);
+        if (user.getRole() == Role.ADMIN && updatedRole != Role.ADMIN && adminCount() <= 1) {
+            throw new IllegalArgumentException("Cannot remove the last admin user");
+        }
+        user.setRole(updatedRole);
         userRepository.save(user);
-        return Map.of("id", user.getId(), "username", user.getUsername(), "role", user.getRole().name());
+        return userMap(user);
+    }
+
+    public Map<String, Object> updateUserPreferences(UUID userId, Map<String, Object> payload) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new com.tophat.health.common.NotFoundException("User not found"));
+        Candidate candidate = user.getCandidate();
+        if (candidate == null) {
+            throw new IllegalArgumentException("Only users linked to a candidate profile have preferences");
+        }
+
+        CandidateProfile profile = candidateProfileRepository.findById(candidate.getId())
+                .orElseGet(() -> {
+                    CandidateProfile created = new CandidateProfile();
+                    created.setCandidate(candidate);
+                    created.setCandidateId(candidate.getId());
+                    return created;
+                });
+
+        if (payload.containsKey("firstName")) {
+            candidate.setFirstName(textValue(payload.get("firstName"), candidate.getFirstName()));
+        }
+        if (payload.containsKey("lastName")) {
+            candidate.setLastName(textValue(payload.get("lastName"), candidate.getLastName()));
+        }
+        if (payload.containsKey("email")) {
+            candidate.setEmail(textValue(payload.get("email"), candidate.getEmail()));
+        }
+        if (payload.containsKey("phone")) {
+            candidate.setPhone(textValue(payload.get("phone"), candidate.getPhone()));
+        }
+        if (payload.containsKey("dateOfBirth")) {
+            candidate.setDateOfBirth(dateValue(payload.get("dateOfBirth")));
+        }
+        if (payload.containsKey("summary")) {
+            profile.setSummary(textValue(payload.get("summary"), profile.getSummary()));
+        }
+        if (payload.containsKey("primaryDiscipline")) {
+            profile.setPrimaryDiscipline(textValue(payload.get("primaryDiscipline"), profile.getPrimaryDiscipline()));
+        }
+        if (payload.containsKey("band")) {
+            profile.setBand(textValue(payload.get("band"), profile.getBand()));
+        }
+        if (payload.containsKey("yearsExperience")) {
+            profile.setYearsExperience(integerValue(payload.get("yearsExperience")));
+        }
+        if (payload.containsKey("currentLocation")) {
+            profile.setCurrentLocation(textValue(payload.get("currentLocation"), profile.getCurrentLocation()));
+        }
+        if (payload.containsKey("preferredRadiusMiles")) {
+            profile.setPreferredRadiusMiles(integerValue(payload.get("preferredRadiusMiles")));
+        }
+        if (payload.containsKey("availabilityStatus")) {
+            profile.setAvailabilityStatus(textValue(payload.get("availabilityStatus"), profile.getAvailabilityStatus()));
+        }
+        if (payload.containsKey("availabilityNotes")) {
+            profile.setAvailabilityNotes(textValue(payload.get("availabilityNotes"), profile.getAvailabilityNotes()));
+        }
+        if (payload.containsKey("availableFrom")) {
+            profile.setAvailableFrom(dateValue(payload.get("availableFrom")));
+        }
+
+        candidateRepository.save(candidate);
+        candidateProfileRepository.save(profile);
+        return userMap(user);
     }
 
     public Map<String, Object> assignAdmin(UUID userId) {
@@ -324,10 +381,7 @@ public class AdminService {
     public Map<String, Object> deleteUser(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new com.tophat.health.common.NotFoundException("User not found"));
-        if (user.getRole() == Role.ADMIN && userRepository.findAll()
-                .stream()
-                .filter(u -> u.getRole() == Role.ADMIN) // Fix: filter on User role
-                .count() <= 1) {
+        if (user.getRole() == Role.ADMIN && adminCount() <= 1) {
             throw new IllegalArgumentException("Cannot delete the last admin user");
         }
         userRepository.delete(user);
@@ -396,5 +450,86 @@ public class AdminService {
 
     private Object value(Object value) {
         return value == null ? "" : value;
+    }
+
+    private long adminCount() {
+        return userRepository.findAll()
+                .stream()
+                .filter(user -> user.getRole() == Role.ADMIN)
+                .count();
+    }
+
+    private Map<String, Object> userMap(User user) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", user.getId());
+        map.put("username", user.getUsername());
+        map.put("role", user.getRole().name());
+        map.put("authProvider", value(user.getAuthProvider()));
+        map.put("emailVerified", user.isEmailVerified());
+        map.put("createdAt", user.getCreatedAt() != null ? user.getCreatedAt().toString() : OffsetDateTime.now().toString());
+
+        Candidate candidate = user.getCandidate();
+        if (candidate != null) {
+            CandidateProfile profile = candidateProfileRepository.findById(candidate.getId()).orElse(null);
+            map.put("candidateId", candidate.getId());
+            map.put("candidateName", candidate.getFirstName() + " " + candidate.getLastName());
+            map.put("candidateStatus", candidate.getStatus());
+            map.put("preferences", candidatePreferences(candidate, profile));
+        } else {
+            map.put("candidateId", "");
+            map.put("candidateName", "");
+            map.put("candidateStatus", "");
+            map.put("preferences", Map.of());
+        }
+
+        Client client = user.getClient();
+        if (client != null) {
+            map.put("clientId", client.getId());
+            map.put("clientName", client.getName());
+        } else {
+            map.put("clientId", "");
+            map.put("clientName", "");
+        }
+        return map;
+    }
+
+    private Map<String, Object> candidatePreferences(Candidate candidate, CandidateProfile profile) {
+        Map<String, Object> preferences = new HashMap<>();
+        preferences.put("firstName", candidate.getFirstName());
+        preferences.put("lastName", candidate.getLastName());
+        preferences.put("email", candidate.getEmail());
+        preferences.put("phone", value(candidate.getPhone()));
+        preferences.put("dateOfBirth", value(candidate.getDateOfBirth()));
+        preferences.put("summary", profile != null ? value(profile.getSummary()) : "");
+        preferences.put("primaryDiscipline", profile != null ? value(profile.getPrimaryDiscipline()) : "");
+        preferences.put("band", profile != null ? value(profile.getBand()) : "");
+        preferences.put("yearsExperience", profile != null ? value(profile.getYearsExperience()) : "");
+        preferences.put("currentLocation", profile != null ? value(profile.getCurrentLocation()) : "");
+        preferences.put("preferredRadiusMiles", profile != null ? value(profile.getPreferredRadiusMiles()) : "");
+        preferences.put("availabilityStatus", profile != null ? value(profile.getAvailabilityStatus()) : "");
+        preferences.put("availabilityNotes", profile != null ? value(profile.getAvailabilityNotes()) : "");
+        preferences.put("availableFrom", profile != null ? value(profile.getAvailableFrom()) : "");
+        return preferences;
+    }
+
+    private String textValue(Object raw, String fallback) {
+        if (raw == null) {
+            return fallback;
+        }
+        return raw.toString().trim();
+    }
+
+    private Integer integerValue(Object raw) {
+        if (raw == null || raw.toString().isBlank()) {
+            return null;
+        }
+        return Integer.valueOf(raw.toString());
+    }
+
+    private LocalDate dateValue(Object raw) {
+        if (raw == null || raw.toString().isBlank()) {
+            return null;
+        }
+        return LocalDate.parse(raw.toString());
     }
 }
